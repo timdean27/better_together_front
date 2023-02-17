@@ -2,7 +2,7 @@ import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { signInWithEmailAndPassword ,signInWithPopup ,signOut} from "firebase/auth";
 import { auth ,googleProvider} from "../../firebase";
-import { AuthContext } from "../../Context/AuthContext";
+import { AuthContext } from "./Context/AuthContext";
 
 
 const FireBaseLogin = ({currentUser}) => {
@@ -13,8 +13,6 @@ const FireBaseLogin = ({currentUser}) => {
   const navitage = useNavigate()
 
   const {dispatch} = useContext(AuthContext);
-
-
 
   const handleLogin = (e) => {
     e.preventDefault();
