@@ -1,5 +1,5 @@
-import { useContext, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useContext, useState , useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { signInWithEmailAndPassword ,signInWithPopup ,signOut} from "firebase/auth";
 import { auth ,googleProvider} from "../../firebase";
 import { AuthContext } from "./Context/AuthContext";
@@ -13,6 +13,8 @@ const FireBaseLogin = ({currentUser}) => {
   const navitage = useNavigate()
 
   const {dispatch} = useContext(AuthContext);
+
+
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -55,10 +57,14 @@ const FireBaseLogin = ({currentUser}) => {
     }
   };
 
+  useEffect(() => {
+  
+  }, [currentUser]);
+
 
   return (
     <div>
-    {currentUser ?
+    {!currentUser ?
     <div className="login">
       <form onSubmit={handleLogin}>
         <input

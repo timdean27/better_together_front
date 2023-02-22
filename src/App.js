@@ -22,7 +22,7 @@ function App() {
             element={
               <RequireAuth/>
             }>
-            <Route element={<Home/>} path="/" exact></Route>
+            <Route element={<Home  currentUser={currentUser}/>} path="/" exact></Route>
             </Route>
       </Routes>
     </BrowserRouter>
