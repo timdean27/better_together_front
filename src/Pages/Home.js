@@ -1,32 +1,20 @@
-import { useContext, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import {
-  signInWithEmailAndPassword,
-  signInWithPopup,
-  signOut,
-} from "firebase/auth";
-import { auth, googleProvider } from "../firebase";
-import { AuthContext } from "../Components/Authentication/Context/AuthContext";
+import React from 'react'
 
-const Home = ({ currentUser }) => {
-  const navitage = useNavigate();
+import FireBaseLogin from '../Components/Authentication/FireBaseLogin'
+import CenterWebPage from './CenterWebPage'
 
-  const logout = async () => {
-    try {
-      await signOut(auth)
-        .then(localStorage.removeItem("user"))
-        .then((currentUser = null));
-    } catch (err) {
-      console.error(err);
-    }
-    navitage("/FireBaseLogin");
-  };
+
+
+const Home = ({currentUser}) => {
   return (
     <div>
-      <div className="homepage-container">HOME</div>
-      <button onClick={logout}>Log Out</button>
-    </div>
-  );
-};
 
-export default Home;
+
+      <FireBaseLogin currentUser={currentUser}/>
+      <CenterWebPage/>
+
+    </div>
+  )
+}
+
+export default Home

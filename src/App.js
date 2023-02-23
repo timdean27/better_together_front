@@ -10,22 +10,26 @@ function App() {
   const { currentUser } = useContext(AuthContext);
   console.log("currentUser in app page" ,currentUser);
 
-  const RequireAuth = () => {
-    return currentUser ? <Outlet/> : <Navigate to="/FireBaseLogin" />;
+  const RequireAuth = ({ children }) => {
+    return currentUser ? children : <Navigate to="/FireBaseLogin" />;
   };
 
   return (
     <BrowserRouter>
-      <Routes>
-          <Route path="FireBaseLogin" element={<FireBaseLogin currentUser={currentUser}/>} />
+    <Routes>
+        <Route path="/">
+        <Route path="FireBaseLogin" element={<FireBaseLogin currentUser={currentUser}/>} />
           <Route
+            index
             element={
-              <RequireAuth/>
-            }>
-            <Route element={<Home  currentUser={currentUser}/>} path="/" exact></Route>
-            </Route>
-      </Routes>
-    </BrowserRouter>
+              <RequireAuth>
+                <Home currentUser={currentUser}/>
+              </RequireAuth>
+            }
+          />
+          </Route>
+    </Routes>
+  </BrowserRouter>
   );
 }
 
