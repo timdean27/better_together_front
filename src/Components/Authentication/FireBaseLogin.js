@@ -1,5 +1,5 @@
-import { useContext, useState , useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useContext, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { signInWithEmailAndPassword ,signInWithPopup ,signOut} from "firebase/auth";
 import { auth ,googleProvider} from "../../firebase";
 import { AuthContext } from "./Context/AuthContext";
@@ -57,11 +57,7 @@ const FireBaseLogin = ({currentUser}) => {
     }
   };
 
-  useEffect(() => {
-  
-  }, [currentUser]);
-
-
+console.log("currentuser in login page" , currentUser)
   return (
     <div>
     {!currentUser ?
@@ -82,7 +78,7 @@ const FireBaseLogin = ({currentUser}) => {
       </form>
       <button onClick={signInWithGoogle}> Sign In With Google</button>
     </div>
-    : <button onClick={logout }>Log Out</button>}
+    : <button onClick={logout}>Log Out</button>}
     </div>
   );
 };

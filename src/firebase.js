@@ -1,4 +1,3 @@
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getAuth , GoogleAuthProvider} from "firebase/auth";
@@ -8,13 +7,13 @@ import { getAuth , GoogleAuthProvider} from "firebase/auth";
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyDVx0TkRV7_HB6w45RWOLM3saWdkWr-l4A",
-  authDomain: "you-map-dev-6723f.firebaseapp.com",
-  projectId: "you-map-dev-6723f",
-  storageBucket: "you-map-dev-6723f.appspot.com",
-  messagingSenderId: "473781569817",
-  appId: "1:473781569817:web:342491760e93b1fec69d88",
-  measurementId: "G-MB56FXRNQE"
+  apiKey: process.env.REACT_APP_FIREBASE_KEY,
+  authDomain: "better-together-dev.firebaseapp.com",
+  projectId: "better-together-dev",
+  storageBucket: "better-together-dev.appspot.com",
+  messagingSenderId: process.env.REACT_APP_FIREBASE_KEY_MESSAGE_SENDER_ID ,
+  appId: process.env.REACT_APP_FIREBASE_KEY_APP_ID,
+  measurementId: process.env.REACT_APP_FIREBASE_KEY_MEASUREMENT_ID
 };
 
 // Initialize Firebase
