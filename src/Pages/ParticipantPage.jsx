@@ -20,8 +20,9 @@ const ParticipantPage = ({ isParticipant }) => {
       ParticipantPage
       <div>
         <form onSubmit={handleAdd}>
-
+          <button>Add Document</button>
         </form>
+        <button type="submit">submit</button>
       </div>
     </div>
   );
