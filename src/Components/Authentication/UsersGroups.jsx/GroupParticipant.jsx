@@ -1,6 +1,6 @@
 import React from 'react'
 
-const GroupParticipant = () => {
+const GroupParticipant = ({currentUser}) => {
   return (
     <div>GroupParticipant</div>
   )

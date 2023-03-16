@@ -1,6 +1,6 @@
 import React from 'react'
 
-const GroupCounselor = () => {
+const GroupCounselor = ({currentUser}) => {
   return (
     <div>GroupCounselor</div>
   )
