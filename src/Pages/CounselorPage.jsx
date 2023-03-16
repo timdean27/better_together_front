@@ -2,7 +2,7 @@ import React, { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import GroupCounselor from "../Components/Authentication/UsersGroups.jsx/GroupCounselor";
 
-const CounselorPage = ({ isCounselor }) => {
+const CounselorPage = ({ isCounselor ,currentUser}) => {
   const navigate = useNavigate();
   console.log("isCounselor from CounselorPage", isCounselor);
   const HomeBTN = (e) => {
@@ -14,7 +14,7 @@ const CounselorPage = ({ isCounselor }) => {
       <button onClick={HomeBTN}>Home</button>
       CounselorPage
       <div>
-        <GroupCounselor/>
+        <GroupCounselor currentUser={currentUser}/>
       </div>
     </div>
   );

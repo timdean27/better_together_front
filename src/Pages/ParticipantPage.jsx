@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { doc , setDoc } from "firebase/firestore"
 import { firebaseDB } from "../firebase";
 import GroupParticipant from "../Components/Authentication/UsersGroups.jsx/GroupParticipant";
-const ParticipantPage = ({ isParticipant }) => {
+const ParticipantPage = ({ isParticipant,currentUser }) => {
   const navigate = useNavigate();
   console.log("isParticipant from ParticipantPage", isParticipant);
   const HomeBTN = (e) => {
@@ -26,7 +26,7 @@ const ParticipantPage = ({ isParticipant }) => {
         <button type="submit">submit</button>
       </div>
       <div>
-        <GroupParticipant/>
+        <GroupParticipant currentUser={currentUser}/>
       </div>
     </div>
   );
