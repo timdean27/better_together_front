@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { signInWithEmailAndPassword, signInWithPopup, signOut } from "firebase/auth";
 import { auth, googleProvider } from "../../firebase";
 import { AuthContext } from "./Context/AuthContext";
+import "../../css/loginPage.css"; // Import the CSS file
 
 const FireBaseLogin = () => {
   const [error, setError] = useState(false);
@@ -49,9 +50,9 @@ const FireBaseLogin = () => {
   };
 
   return (
-    <div>
+    <div className="login">
       {!currentUser ? (
-        <div className="login">
+        <div>
           <form onSubmit={handleLogin}>
             <input
               type="email"
@@ -66,11 +67,15 @@ const FireBaseLogin = () => {
             <button type="submit">Login</button>
             {error && <span>Wrong email or password!</span>}
           </form>
-          <button onClick={signInWithGoogle}>Sign In With Google</button>
+          <button className="google-button" onClick={signInWithGoogle}>
+            Sign In With Google
+          </button>
           <Link to="/create-user">Create New User</Link>
         </div>
       ) : (
-        <button onClick={logout}>Log Out</button>
+        <button className="logout-button" onClick={logout}>
+          Log Out
+        </button>
       )}
     </div>
   );
