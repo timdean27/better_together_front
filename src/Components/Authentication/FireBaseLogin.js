@@ -37,6 +37,7 @@ const FireBaseLogin = () => {
     }
   };
 
+  // for fail safe if logout on home does not work
   const logout = async () => {
     try {
       await signOut(auth);
