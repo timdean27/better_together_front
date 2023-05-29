@@ -12,13 +12,9 @@ import FireBaseLogin from "./Components/Authentication/FireBaseLogin";
 import FireBaseCreateUser from "./Components/Authentication/FireBaseCreateUser";
 import { AuthContext } from "./Components/Authentication/Context/AuthContext";
 
-import ParticipantPage from "./Pages/ParticipantPage";
-import CounselorPage from "./Pages/CounselorPage";
 
 function App() {
   const { currentUser } = useContext(AuthContext);
-  const [isParticipant, setIsParticipant] = useState(null);
-  const [isCounselor, setIsCounselor] = useState(null);
   console.log("currentUser in app page", currentUser);
 
   const RequireAuth = ({ children }) => {
@@ -39,35 +35,11 @@ function App() {
               <RequireAuth>
                 <Home
                   currentUser={currentUser}
-                  setIsParticipant={setIsParticipant}
-                  setIsCounselor={setIsCounselor}
-                />
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="/Participant"
-            element={
-              <RequireAuth>
-                <ParticipantPage
-                  currentUser={currentUser}
-                  isParticipant={isParticipant}
                 />
               </RequireAuth>
             }
           />
         </Route>
-        <Route
-          path="/Counselor"
-          element={
-            <RequireAuth>
-              <CounselorPage
-                currentUser={currentUser}
-                isCounselor={isCounselor}
-              />
-            </RequireAuth>
-          }
-        />
       </Routes>
     </BrowserRouter>
   );
