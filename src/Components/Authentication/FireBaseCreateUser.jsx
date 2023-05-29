@@ -1,31 +1,44 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../firebase";
+import { useNavigate } from "react-router-dom";
 
 const FireBaseCreateUser = () => {
-  const [error, setError] = useState(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const handleCreateUser = (e) => {
     e.preventDefault();
-
+    setError("");
+  
+    // Password validation regex
+    const passwordRegex = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-zA-Z]).{8,}$/;
+  
+    if (!passwordRegex.test(password)) {
+      setError(
+        "Password must be at least 8 characters long and contain at least one number and one special character."
+      );
+      return;
+    }
+  
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        // User created successfully
-        const user = userCredential.user;
-        console.log("New user created:", user);
-        // You can perform additional actions after user creation if needed
+        // User creation successful
+        console.log("User created:", userCredential.user);
+        navigate("/FireBaseLogin"); // Redirect to login page
       })
       .catch((error) => {
-        // An error occurred during user creation
-        setError(error.message);
+        // Handle error during user creation
+        console.error("Error creating user:", error);
+        setError("Failed to create user. Please try again.");
       });
   };
 
   return (
-    <div className="create-user">
-      <h2>Create User</h2>
+    <div>
+      <h1>Create User</h1>
       <form onSubmit={handleCreateUser}>
         <input
           type="email"
@@ -39,9 +52,9 @@ const FireBaseCreateUser = () => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        {error && <p className="error">{error}</p>}
         <button type="submit">Create User</button>
       </form>
+      {error && <p>{error}</p>}
     </div>
   );
 };
