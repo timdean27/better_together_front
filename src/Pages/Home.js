@@ -3,12 +3,15 @@ import FireBaseLogin from "../Components/Authentication/FireBaseLogin";
 
 import { useNavigate } from "react-router-dom";
 
-const Home = ({ currentUser, setIsParticipant, setIsCounselor }) => {
+const Home = ({ currentUser, logout}) => {
   const navigate = useNavigate();
 
   return (
     <div>
-      <FireBaseLogin currentUser={currentUser} />
+      <div>
+      <h1>Welcome to the Home Page</h1>
+      {currentUser && <button onClick={logout}>Log Out</button>}
+    </div>
       <div>
         This App is to create a safe environment to get help from a group of
         people going through the same issues. Groups are created with 6 people
