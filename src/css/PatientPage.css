@@ -1,0 +1,38 @@
+.button-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-gap: 10px;
+    justify-items: center;
+  }
+  
+  .button-container button {
+    width: 100%;
+    padding: 15px;
+    background-color: #e0e0e0;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .button-container button:hover {
+    background-color: #d3d3d3;
+  }
+  
+  .button-container button:focus {
+    outline: none;
+  }
+  
+  /* Media query for smaller screens */
+  @media (max-width: 768px) {
+    .button-container {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  
+  
+  
+  
+  
+  
+  
