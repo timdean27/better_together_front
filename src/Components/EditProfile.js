@@ -1,72 +1,65 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { createUserProfile } from "../firebase";
+import { getUserProfile, updateUserProfile } from "../firebase";
 
-const ProfileCreation = ({ currentUser }) => {
+const EditProfile = ({ currentUser }) => {
   const navigate = useNavigate();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [address, setAddress] = useState("");
   const [helpNeeded, setHelpNeeded] = useState("");
   const [hasReceivedTherapy, setHasReceivedTherapy] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
 
-  const handleCreateProfile = async (e) => {
+  useEffect(() => {
+    // Fetch the user profile data from Firebase
+    const fetchUserProfile = async () => {
+      try {
+        const userProfile = await getUserProfile(currentUser.uid);
+        setFirstName(userProfile.firstName);
+        setLastName(userProfile.lastName);
+        setAddress(userProfile.address);
+        setHelpNeeded(userProfile.helpNeeded);
+        setHasReceivedTherapy(userProfile.hasReceivedTherapy);
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+        // Handle error if fetching user profile fails
+      }
+    };
+
+    fetchUserProfile();
+  }, [currentUser.uid]);
+
+  const handleUpdateProfile = async (e) => {
     e.preventDefault();
-  
-    // Array to store the names of empty fields
-    const emptyFields = [];
-  
-    // Check if each field is empty and add its name to the emptyFields array
-    if (!firstName) {
-      emptyFields.push("First Name");
-    }
-    if (!lastName) {
-      emptyFields.push("Last Name");
-    }
-    if (!address) {
-      emptyFields.push("Address");
-    }
-    if (!helpNeeded) {
-      emptyFields.push("Help Needed");
-    }
-    if (!hasReceivedTherapy) {
-      emptyFields.push("Has Received Therapy");
-    }
-  
-    // If any fields are empty, display an error message
-    if (emptyFields.length > 0) {
-      const message = `Please fill in the following fields: ${emptyFields.join(", ")}`;
-      setErrorMessage(message);
-      return;
-    }
-  
-    // Create a user profile object with the input values
-    const userProfile = {
-      Identifier: currentUser.email, // Use email as the Identifier
+
+    // Create a user profile object with the updated input values
+    const updatedProfile = {
       firstName,
       lastName,
       address,
       helpNeeded,
       hasReceivedTherapy,
     };
-  
+
     try {
-      // Store the user profile data in Firebase using the UID
-      await createUserProfile(currentUser.uid, userProfile);
-  
+      // Update the user profile data in Firebase
+      await updateUserProfile(currentUser.uid, updatedProfile);
+
       window.location.reload(); // Refresh the page
     } catch (error) {
-      console.error("Error creating user profile:", error);
-      // Handle error if profile creation fails
+      console.error("Error updating user profile:", error);
+      // Handle error if profile update fails
     }
+  };
+
+  const handleDone = () => {
+    navigate("/"); // Navigate back to the home page
   };
 
   return (
     <div>
-      <h1>Create Profile</h1>
-      {errorMessage && <p>{errorMessage}</p>}
-      <form onSubmit={handleCreateProfile}>
+      <h1>Edit Profile</h1>
+      <form onSubmit={handleUpdateProfile}>
         <input
           type="text"
           placeholder="First Name"
@@ -111,12 +104,12 @@ const ProfileCreation = ({ currentUser }) => {
             No
           </label>
         </div>
-        <button type="submit">Create Profile</button>
+        <button type="submit">Update Profile</button>
+        <button type="button" onClick={handleDone}>Done</button>
       </form>
     </div>
   );
 };
 
-export default ProfileCreation;
-
+export default EditProfile;
 

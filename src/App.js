@@ -9,6 +9,7 @@ import PatientPage from "./Pages/PatientPage";
 import CategoryPage from "./Pages/CategoryPage";
 import BackButton from "./Components/BackButton";
 import ProfileCreation from "./Components/ProfileCreation";
+import EditProfile from "./Components/EditProfile";
 import { checkUserProfileExists, createUserProfile } from "./firebase";
 
 const RequireAuth = ({ children }) => {
@@ -24,7 +25,7 @@ function App() {
   useEffect(() => {
     const checkUserProfile = async () => {
       if (currentUser) {
-        const exists = await checkUserProfileExists(currentUser.email);
+        const exists = await checkUserProfileExists(currentUser.uid);
         setProfileExists(exists);
       }
     };
@@ -33,7 +34,7 @@ function App() {
   }, [currentUser]);
 
   const handleProfileCreation = async (profileData) => {
-    await createUserProfile(currentUser.email, profileData);
+    await createUserProfile(currentUser.uid, profileData);
     setProfileExists(true);
   };
 
@@ -60,6 +61,14 @@ function App() {
                 onCreateProfile={handleProfileCreation}
               />
             )
+          }
+        />
+        <Route
+          path="/edit-profile"
+          element={
+            <RequireAuth>
+              <EditProfile currentUser={currentUser} />
+            </RequireAuth>
           }
         />
         <Route
