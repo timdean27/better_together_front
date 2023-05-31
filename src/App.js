@@ -8,6 +8,8 @@ import CounselorPage from "./Pages/CounselorPage";
 import PatientPage from "./Pages/PatientPage";
 import CategoryPage from "./Pages/CategoryPage";
 import BackButton from "./Components/BackButton";
+import ProfileCreation from "./Components/ProfileCreation";
+import { checkUserProfileExists, createUserProfile } from "./firebase";
 
 const RequireAuth = ({ children }) => {
   const { currentUser } = useContext(AuthContext);
@@ -17,30 +19,47 @@ const RequireAuth = ({ children }) => {
 function App() {
   const { currentUser } = useContext(AuthContext);
   const [selectedRole, setSelectedRole] = useState(null);
+  const [profileExists, setProfileExists] = useState(false);
 
   useEffect(() => {
-    const storedRole = localStorage.getItem("selectedRole");
-    if (storedRole) {
-      setSelectedRole(storedRole);
-    }
-  }, []);
+    const checkUserProfile = async () => {
+      if (currentUser) {
+        const exists = await checkUserProfileExists(currentUser.email);
+        setProfileExists(exists);
+      }
+    };
+
+    checkUserProfile();
+  }, [currentUser]);
+
+  const handleProfileCreation = async (profileData) => {
+    await createUserProfile(currentUser.email, profileData);
+    setProfileExists(true);
+  };
 
   return (
     <BrowserRouter>
-    <BackButton /> {/* Back button available on all pages */}
+      <BackButton /> {/* Back button available on all pages */}
       <Routes>
         <Route path="/FireBaseLogin" element={<FireBaseLogin />} />
         <Route path="/create-user" element={<FireBaseCreateUser />} />
         <Route
           path="/"
           element={
-            <RequireAuth>
-              <Home
+            profileExists ? (
+              <RequireAuth>
+                <Home
+                  currentUser={currentUser}
+                  selectedRole={selectedRole}
+                  onRoleSelect={setSelectedRole}
+                />
+              </RequireAuth>
+            ) : (
+              <ProfileCreation
                 currentUser={currentUser}
-                selectedRole={selectedRole}
-                onRoleSelect={setSelectedRole}
+                onCreateProfile={handleProfileCreation}
               />
-            </RequireAuth>
+            )
           }
         />
         <Route
