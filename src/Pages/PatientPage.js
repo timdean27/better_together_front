@@ -32,7 +32,7 @@ const PatientPage = ({ selectedRole }) => {
       <div className="button-container">
         {commonGroupTherapyTitles.map((title, index) => (
           <Link key={index} to={`/category/${encodeURIComponent(title)}`}>
-            <button>{title}</button>
+            <button className="bubble-button">{title}</button>
           </Link>
         ))}
       </div>

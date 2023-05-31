@@ -7,6 +7,7 @@ import Home from "./Pages/Home";
 import CounselorPage from "./Pages/CounselorPage";
 import PatientPage from "./Pages/PatientPage";
 import CategoryPage from "./Pages/CategoryPage";
+import BackButton from "./Components/BackButton";
 
 const RequireAuth = ({ children }) => {
   const { currentUser } = useContext(AuthContext);
@@ -26,6 +27,7 @@ function App() {
 
   return (
     <BrowserRouter>
+    <BackButton /> {/* Back button available on all pages */}
       <Routes>
         <Route path="/FireBaseLogin" element={<FireBaseLogin />} />
         <Route path="/create-user" element={<FireBaseCreateUser />} />

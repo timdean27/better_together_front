@@ -3,14 +3,14 @@ import { Link } from "react-router-dom";
 import "../css/CounselorPage.css";
 
 const CounselorPage = ({ selectedRole }) => {
-  const [role, setRole] = useState(selectedRole);
+    const [role, setRole] = useState(selectedRole);
 
-  useEffect(() => {
-    const storedRole = localStorage.getItem("selectedRole");
-    if (storedRole) {
-      setRole(storedRole);
-    }
-  }, []);
+    useEffect(() => {
+      const storedRole = localStorage.getItem("selectedRole");
+      if (storedRole) {
+        setRole(storedRole);
+      }
+    }, []);
 
   const commonGroupTherapyTitles = [
     "Anxiety Support Group",
@@ -32,7 +32,7 @@ const CounselorPage = ({ selectedRole }) => {
       <div className="button-container">
         {commonGroupTherapyTitles.map((title, index) => (
           <Link key={index} to={`/category/${encodeURIComponent(title)}`}>
-            <button>{title}</button>
+            <button className="bubble-button">{title}</button>
           </Link>
         ))}
       </div>
