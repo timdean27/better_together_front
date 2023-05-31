@@ -1,0 +1,45 @@
+/* CSS for PatientPage */
+.patient-page {
+  /* Your existing styles for the patient page */
+
+  /* Add the following styles for bubble buttons */
+  .button-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .bubble-button {
+    background-color: #f5f5f5;
+    border: none;
+    border-radius: 50px;
+    padding: 10px 20px;
+    font-size: 16px;
+    color: #333;
+    text-decoration: none;
+    cursor: pointer;
+  }
+}
+
+/* Additional CSS for Mobile-Friendly Layout */
+@media (max-width: 768px) {
+  .patient-page .button-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .patient-page .bubble-button {
+    width: 100%;
+    max-width: 300px;
+  }
+}
+  
+  
+  
+  
+  
+  
+  
+  
