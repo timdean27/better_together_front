@@ -16,12 +16,14 @@ const Home = ({ currentUser }) => {
     }
   }, []);
 
-  const handleRoleSelection = (role) => {
-    setSelectedRole(role);
-    localStorage.setItem("selectedRole", role);
-    navigate(`/${role.toLowerCase()}`);
-  };
 
+  const handleRoleSelection = async (role) => {
+    localStorage.removeItem("selectedRole"); // Clear the previous selected role from local storage
+    setSelectedRole(role); // Set the selected role in state
+    localStorage.setItem("selectedRole", role); // Store the selected role in local storage
+    await navigate(`/${role.toLowerCase()}`); // Navigate to the desired page
+  };
+  
   const handleLogout = async () => {
     try {
       await signOut(auth);

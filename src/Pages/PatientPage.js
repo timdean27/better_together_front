@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import "../css/PatientPage.css";
 
 const PatientPage = ({ selectedRole }) => {
@@ -10,10 +11,6 @@ const PatientPage = ({ selectedRole }) => {
       setRole(storedRole);
     }
   }, []);
-
-  useEffect(() => {
-    localStorage.setItem("selectedRole", role);
-  }, [role]);
 
   const commonGroupTherapyTitles = [
     "Anxiety Support Group",
@@ -29,12 +26,14 @@ const PatientPage = ({ selectedRole }) => {
   ];
 
   return (
-    <div>
+    <div className="patient-page">
       <h1>Patient Page</h1>
-      <p>Selected Role: {selectedRole}</p>
+      <p>Selected Role: {role}</p>
       <div className="button-container">
         {commonGroupTherapyTitles.map((title, index) => (
-          <button key={index}>{title}</button>
+          <Link key={index} to={`/category/${encodeURIComponent(title)}`}>
+            <button>{title}</button>
+          </Link>
         ))}
       </div>
       {/* Rest of the Patient Page content */}

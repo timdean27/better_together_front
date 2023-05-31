@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthContext } from "./Components/Authentication/Context/AuthContext";
 import FireBaseCreateUser from "./Components/Authentication/FireBaseCreateUser";
@@ -6,6 +6,7 @@ import FireBaseLogin from "./Components/Authentication/FireBaseLogin";
 import Home from "./Pages/Home";
 import CounselorPage from "./Pages/CounselorPage";
 import PatientPage from "./Pages/PatientPage";
+import CategoryPage from "./Pages/CategoryPage";
 
 const RequireAuth = ({ children }) => {
   const { currentUser } = useContext(AuthContext);
@@ -15,6 +16,13 @@ const RequireAuth = ({ children }) => {
 function App() {
   const { currentUser } = useContext(AuthContext);
   const [selectedRole, setSelectedRole] = useState(null);
+
+  useEffect(() => {
+    const storedRole = localStorage.getItem("selectedRole");
+    if (storedRole) {
+      setSelectedRole(storedRole);
+    }
+  }, []);
 
   return (
     <BrowserRouter>
@@ -49,9 +57,23 @@ function App() {
             </RequireAuth>
           }
         />
+        <Route
+          path="/category/:categoryName"
+          element={
+            <RequireAuth>
+              <CategoryPage selectedRole={selectedRole} />
+            </RequireAuth>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );
 }
 
 export default App;
+
+
+
+
+
+
