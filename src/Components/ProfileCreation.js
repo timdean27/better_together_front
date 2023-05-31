@@ -9,11 +9,37 @@ const ProfileCreation = () => {
   const [address, setAddress] = useState("");
   const [helpNeeded, setHelpNeeded] = useState("");
   const [hasReceivedTherapy, setHasReceivedTherapy] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleCreateProfile = async (e) => {
     e.preventDefault();
 
-    // Perform validation or any additional processing here
+    // Array to store the names of empty fields
+    const emptyFields = [];
+
+    // Check if each field is empty and add its name to the emptyFields array
+    if (!firstName) {
+      emptyFields.push("First Name");
+    }
+    if (!lastName) {
+      emptyFields.push("Last Name");
+    }
+    if (!address) {
+      emptyFields.push("Address");
+    }
+    if (!helpNeeded) {
+      emptyFields.push("Help Needed");
+    }
+    if (!hasReceivedTherapy) {
+      emptyFields.push("Has Received Therapy");
+    }
+
+    // If any fields are empty, display an error message
+    if (emptyFields.length > 0) {
+      const message = `Please fill in the following fields: ${emptyFields.join(", ")}`;
+      setErrorMessage(message);
+      return;
+    }
 
     // Create a user profile object with the input values
     const userProfile = {
@@ -28,8 +54,7 @@ const ProfileCreation = () => {
       // Store the user profile data in Firebase
       await createUserProfile(userProfile);
 
-      // Redirect to a different page after profile creation
-      navigate("/dashboard"); // Replace "/dashboard" with the desired destination page
+      window.location.reload(); // Refresh the page
     } catch (error) {
       console.error("Error creating user profile:", error);
       // Handle error if profile creation fails
@@ -39,6 +64,7 @@ const ProfileCreation = () => {
   return (
     <div>
       <h1>Create Profile</h1>
+      {errorMessage && <p>{errorMessage}</p>}
       <form onSubmit={handleCreateProfile}>
         <input
           type="text"
