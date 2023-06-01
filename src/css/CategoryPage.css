@@ -28,24 +28,21 @@
     height: 20px;
     border-radius: 50%;
     margin: 2px;
+    background-color: #ccc;
+    border: 1px solid #000;
     cursor: pointer;
-    border: 1px solid #000; /* Black border */
-    background-color: #ccc; /* Gray background */
   }
   
   .dot.blue {
     background-color: #007bff;
-    border-color: #007bff; /* Blue border */
   }
   
-  .dot.red {
+  .dot.dark-red {
     background-color: #ff0000;
-    border-color: #ff0000; /* Red border */
   }
   
-  .dot.empty {
-    background-color: #ccc;
-    cursor: default;
+  .dot.light-red {
+    background-color: #ff8080;
   }
   
   @media (max-width: 768px) {
@@ -61,6 +58,7 @@
       margin: 1px;
     }
   }
+  
   
   
   

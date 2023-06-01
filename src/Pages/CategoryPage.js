@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+
+import { joinRoom } from "../firebaseServices/joinRoomServices"; // Import the joinRoom function
+
 import "../css/CategoryPage.css"; // Import the CSS file
 
 const CategoryPage = ({ selectedRole }) => {
@@ -28,23 +31,29 @@ const CategoryPage = ({ selectedRole }) => {
   };
 
   const handleDotClick = (roomIndex, dotIndex) => {
-    const updatedRooms = [...rooms];
-    const room = updatedRooms[roomIndex];
-    if (role === "Patient") {
-      if (room.patients < 7) {
-        room.patients += 1;
+    const updatedRooms = rooms.map((room, index) => {
+      if (index === roomIndex) {
+        if (role === "Patient" && room.patients < 7) {
+          return {
+            ...room,
+            patients: room.patients + 1
+          };
+        } else if (role === "Counselor" && (dotIndex === 7 || dotIndex === 8) && room.counselors < 2) {
+          return {
+            ...room,
+            counselors: room.counselors + 1
+          };
+        }
       }
-    } else if (role === "Counselor") {
-      if (room.counselors < 2) {
-        room.counselors += 1;
-      }
-    }
+      return room;
+    });
+
     setRooms(updatedRooms);
-    
     console.log("Current Rooms:", updatedRooms);
     console.log("Current Patients:", updatedRooms[roomIndex].patients);
     console.log("Current Counselors:", updatedRooms[roomIndex].counselors);
   };
+
   return (
     <div>
       <h1>Category Page</h1>
@@ -68,11 +77,11 @@ const CategoryPage = ({ selectedRole }) => {
               <div
                 key={`counselor-${counselorIndex}`}
                 className={`dot ${
-                  role === "Counselor" && room.counselors > counselorIndex
+                  role === "Counselor" && room.counselors > counselorIndex && (counselorIndex === 0 || counselorIndex === 1)
                     ? "dark-red"
                     : ""
                 }`}
-                onClick={() => handleDotClick(roomIndex, counselorIndex)}
+                onClick={() => handleDotClick(roomIndex, counselorIndex + 7)}
               ></div>
             ))}
           </div>
@@ -84,5 +93,4 @@ const CategoryPage = ({ selectedRole }) => {
 };
 
 export default CategoryPage;
-
 
