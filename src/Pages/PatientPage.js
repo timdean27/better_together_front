@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState  } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import "../css/PatientPage.css";
 
 const PatientPage = ({ selectedRole }) => {
   const [role, setRole] = useState(selectedRole);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const storedRole = localStorage.getItem("selectedRole");
@@ -25,15 +26,24 @@ const PatientPage = ({ selectedRole }) => {
     "Stress Management Workshop",
   ];
 
+  const handleGroupSelection = (groupTitle) => {
+    const encodedTitle = encodeURIComponent(groupTitle);
+    navigate(`/category/${encodedTitle}`);
+  };
+
   return (
     <div className="patient-page">
       <h1>Patient Page</h1>
       <p>Selected Role: {role}</p>
       <div className="button-container">
         {commonGroupTherapyTitles.map((title, index) => (
-          <Link key={index} to={`/category/${encodeURIComponent(title)}`}>
-            <button className="bubble-button">{title}</button>
-          </Link>
+          <button
+            key={index}
+            className="bubble-button"
+            onClick={() => handleGroupSelection(title)}
+          >
+            {title}
+          </button>
         ))}
       </div>
       {/* Rest of the Patient Page content */}
