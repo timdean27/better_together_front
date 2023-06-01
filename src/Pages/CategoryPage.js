@@ -18,13 +18,14 @@ const CategoryPage = ({ selectedRole }) => {
 
   const initializeRooms = () => {
     const initialRooms = [
-      { id: 1, patients: 0, counselors: 0 },
-      { id: 2, patients: 0, counselors: 0 },
-      { id: 3, patients: 0, counselors: 0 },
-      { id: 4, patients: 0, counselors: 0 },
-      { id: 5, patients: 0, counselors: 0 },
-      { id: 6, patients: 0, counselors: 0 },
+      { id: 1, patients: 0, counselors: [] },
+      { id: 2, patients: 0, counselors: [] },
+      { id: 3, patients: 0, counselors: [] },
+      { id: 4, patients: 0, counselors: [] },
+      { id: 5, patients: 0, counselors: [] },
+      { id: 6, patients: 0, counselors: [] },
     ];
+
     setRooms(initialRooms);
   };
 
@@ -33,23 +34,24 @@ const CategoryPage = ({ selectedRole }) => {
     const room = updatedRooms[roomIndex];
 
     if (role === "Patient") {
-      if (room.patients < 7) {
+      if (room.patients < 6) {
         room.patients += 1;
       }
     } else if (role === "Counselor") {
-      if (dotIndex === 7 || dotIndex === 8) { // Only allow dots 8 and 9 to turn red
-        if (room.counselors < 2) {
-          room.counselors += 1;
-          const dotElement = document.getElementById(`dot-${roomIndex}-${dotIndex}`);
-          dotElement.classList.add("dark-red");
-        }
+      const counselors = room.counselors;
+      if (counselors.length < 3 && [7, 8, 9].includes(dotIndex)) {
+        counselors.push(dotIndex);
+        const dotElement = document.getElementById(`dot-${roomIndex}-${dotIndex}`);
+        dotElement.classList.add("dark-red");
       }
     }
 
     setRooms(updatedRooms);
     console.log("Current Rooms:", updatedRooms);
     console.log("Current Patients:", updatedRooms[roomIndex].patients);
-    console.log("Current Counselors:", updatedRooms[roomIndex].counselors);
+    console.log("Current Counselors:", room.counselors);
+    console.log("Clicked Dot Index:", dotIndex);
+    console.log("Clicked Room:", room);
 
     const roomJoinData = {
       userRole: role,
@@ -59,7 +61,7 @@ const CategoryPage = ({ selectedRole }) => {
     };
 
     try {
-        await joinRoom(roomIndex, role, new Date().getTime(), categoryName);
+      await joinRoom(roomIndex, role, new Date().getTime(), categoryName);
       console.log("Room join data saved to Firestore:", roomJoinData);
     } catch (error) {
       console.error("Error joining room:", error);
@@ -74,24 +76,22 @@ const CategoryPage = ({ selectedRole }) => {
       <div className="room-container">
         {rooms.map((room, roomIndex) => (
           <div key={room.id} className="room">
-            {[...Array(7)].map((_, patientIndex) => (
+            {[...Array(6)].map((_, patientIndex) => (
               <div
                 key={`patient-${patientIndex}`}
                 id={`dot-${roomIndex}-${patientIndex}`}
                 className={`dot ${
-                  role === "Patient" && room.patients > patientIndex
-                    ? "blue"
-                    : ""
+                  role === "Patient" && room.patients > patientIndex ? "blue" : ""
                 }`}
                 onClick={() => handleDotClick(roomIndex, patientIndex, categoryName)}
               ></div>
             ))}
-            {[...Array(2)].map((_, counselorIndex) => (
+            {[...Array(3)].map((_, counselorIndex) => (
               <div
                 key={`counselor-${counselorIndex}`}
                 id={`dot-${roomIndex}-${counselorIndex + 7}`}
                 className={`dot ${
-                  role === "Counselor" && room.counselors > counselorIndex
+                  role === "Counselor" && room.counselors.includes(counselorIndex + 7)
                     ? "dark-red"
                     : ""
                 }`}
@@ -107,4 +107,6 @@ const CategoryPage = ({ selectedRole }) => {
 };
 
 export default CategoryPage;
+
+
 
