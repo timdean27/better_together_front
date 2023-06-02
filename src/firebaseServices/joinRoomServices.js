@@ -1,5 +1,6 @@
-import { setDoc, collection, doc } from "firebase/firestore";
-import { firebaseDB, auth } from "../firebase";
+import { setDoc, collection, doc, query, where, getDocs } from "firebase/firestore";
+import { firebaseDB } from "../firebase";
+import { auth } from "../firebase";
 
 export const joinRoom = async (roomIndex, role, timestamp, categoryName) => {
   try {
@@ -33,6 +34,26 @@ export const joinRoom = async (roomIndex, role, timestamp, categoryName) => {
   } catch (error) {
     console.error("Error storing joined room in Firestore:", error);
     throw error;
+  }
+};
+
+export const getSignedUpRooms = async (role, categoryName) => {
+  try {
+    const q = query(
+      collection(firebaseDB, "clientsCurrentRooms"),
+      where("userRole", "==", role),
+      where("categoryName", "==", categoryName)
+    );
+    const querySnapshot = await getDocs(q);
+
+    const signedUpRooms = [];
+    querySnapshot.forEach((doc) => {
+      signedUpRooms.push(doc.data().roomIndex);
+    });
+
+    return signedUpRooms;
+  } catch (error) {
+    throw new Error("Error fetching signed up rooms: " + error.message);
   }
 };
 
