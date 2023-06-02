@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import "../css/CategoryPage.css"; // Import the CSS file
-import { joinRoom } from "../firebaseServices/joinRoomServices";
+import { joinRoom, getSignedUpRooms } from "../firebaseServices/joinRoomServices";
 
 const CategoryPage = ({ selectedRole }) => {
   const { categoryName } = useParams();
   const [role, setRole] = useState(selectedRole);
   const [rooms, setRooms] = useState([]);
+  const [signedUpRooms, setSignedUpRooms] = useState([]);
 
   useEffect(() => {
     const storedRole = localStorage.getItem("selectedRole");
@@ -14,8 +15,10 @@ const CategoryPage = ({ selectedRole }) => {
       setRole(storedRole);
     }
     initializeRooms();
+    fetchSignedUpRooms();
   }, []);
 
+  // Initialize the rooms state with default values
   const initializeRooms = () => {
     const initialRooms = [
       { id: 1, patients: 0, counselors: [] },
@@ -29,29 +32,43 @@ const CategoryPage = ({ selectedRole }) => {
     setRooms(initialRooms);
   };
 
+  // Fetch the signed up rooms for the user's role and category from Firestore
+  const fetchSignedUpRooms = async () => {
+    try {
+      const signedUpRoomsData = await getSignedUpRooms(role, categoryName);
+      setSignedUpRooms(signedUpRoomsData);
+      console.log("Signed Up Rooms:", signedUpRoomsData);
+    } catch (error) {
+      console.error("Error fetching signed up rooms:", error);
+    }
+  };
+
+  // Handle the click event of a dot
   const handleDotClick = async (roomIndex, dotIndex) => {
     const updatedRooms = [...rooms];
     const room = updatedRooms[roomIndex];
+
+    if (signedUpRooms.includes(roomIndex)) {
+      console.log("User has already signed up for a room in this category");
+      return;
+    }
 
     if (role === "Patient") {
       if (room.patients < 6) {
         room.patients += 1;
       }
     } else if (role === "Counselor") {
-      const counselors = room.counselors;
-      if (counselors.length < 3 && [7, 8, 9].includes(dotIndex)) {
-        counselors.push(dotIndex);
-        const dotElement = document.getElementById(`dot-${roomIndex}-${dotIndex}`);
-        dotElement.classList.add("dark-red");
+      if (dotIndex === 7 || dotIndex === 8 || dotIndex === 9) {
+        if (room.counselors.length < 3) {
+          room.counselors.push(dotIndex);
+        }
       }
     }
 
     setRooms(updatedRooms);
     console.log("Current Rooms:", updatedRooms);
     console.log("Current Patients:", updatedRooms[roomIndex].patients);
-    console.log("Current Counselors:", room.counselors);
-    console.log("Clicked Dot Index:", dotIndex);
-    console.log("Clicked Room:", room);
+    console.log("Current Counselors:", updatedRooms[roomIndex].counselors);
 
     const roomJoinData = {
       userRole: role,
