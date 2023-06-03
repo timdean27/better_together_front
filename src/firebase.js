@@ -6,9 +6,6 @@ import {
   getDoc,
   setDoc,
   collection,
-  query,
-  where,
-  getDocs,
 } from "firebase/firestore";
 
 // Your web app's Firebase configuration
@@ -22,14 +19,11 @@ const firebaseConfig = {
   appId: process.env.REACT_APP_FIREBASE_KEY_APP_ID,
   measurementId: process.env.REACT_APP_FIREBASE_KEY_MEASUREMENT_ID,
 };
-
-
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
 export const firebaseDB = getFirestore(app);
-
 
 export const checkUserProfileExists = async (uid) => {
   const userProfileRef = doc(firebaseDB, "userProfiles", uid);
