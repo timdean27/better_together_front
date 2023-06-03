@@ -15,16 +15,27 @@ export const joinRoom = async (roomIndex, role, timestamp, categoryName) => {
     console.log("Role:", role);
     console.log("Category Name:", categoryName);
 
+    const signedUpRooms = await getSignedUpRooms(role, categoryName);
+    if (signedUpRooms.includes(roomIndex)) {
+      throw new Error("User already joined a room for this category");
+    }
+
+    const hasRoomForCategory = await checkUserHasRoomForCategory(uid, categoryName);
+    if (hasRoomForCategory) {
+      throw new Error("User already has a room for this category");
+    }
+
     const joinedRoom = {
       roomIndex: roomIndex,
       userRole: role,
       categoryName: categoryName,
       timestamp: timestamp,
+      uid: uid,
     };
 
     const clientsCurrentRoomsCollection = collection(
       firebaseDB,
-      "clientsCurrentRooms" // Provide the correct collection name here
+      "clientsCurrentRooms"
     );
     const newDocRef = doc(clientsCurrentRoomsCollection, uid);
 
@@ -54,6 +65,32 @@ export const getSignedUpRooms = async (role, categoryName) => {
     return signedUpRooms;
   } catch (error) {
     throw new Error("Error fetching signed up rooms: " + error.message);
+  }
+};
+
+export const getUserSignedUpRooms = async (uid, categoryName) => {
+  try {
+    const signedUpRooms = await getSignedUpRooms(uid, categoryName);
+    // Here you can update your user interface to reflect the signed up rooms
+    // For example, set a state variable indicating the signed up rooms for the user
+    console.log("Signed up rooms for category", categoryName, ":", signedUpRooms);
+  } catch (error) {
+    console.error("Error fetching user's signed up rooms:", error);
+  }
+};
+
+export const checkUserHasRoomForCategory = async (uid, categoryName) => {
+  try {
+    const q = query(
+      collection(firebaseDB, "clientsCurrentRooms"),
+      where("uid", "==", uid),
+      where("categoryName", "==", categoryName)
+    );
+    const querySnapshot = await getDocs(q);
+    return !querySnapshot.empty;
+  } catch (error) {
+    console.error("Error checking user's room for category:", error);
+    return false;
   }
 };
 
