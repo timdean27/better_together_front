@@ -42,7 +42,7 @@ const CategoryPage = ({ selectedRole }) => {
   // Fetch the signed up rooms for the user's role and category from Firestore
   const fetchSignedUpRooms = async () => {
     try {
-      const signedUpRoomsData = await getSignedUpRooms(role, categoryName);
+      const signedUpRoomsData = await getSignedUpRooms(categoryName);
       setSignedUpRooms(signedUpRoomsData);
       console.log("Signed Up Rooms:", signedUpRoomsData);
 
@@ -67,9 +67,9 @@ const CategoryPage = ({ selectedRole }) => {
   // Initialize or fetch the client's room collection for the current category
   const initializeClientRoomCollection = async () => {
     try {
-      const collection = await getClientRoomCollection(categoryName);
-      if (collection) {
-        setClientRoomCollection(collection);
+      const collectionRef = await getClientRoomCollection(categoryName);
+      if (collectionRef) {
+        setClientRoomCollection(collectionRef);
       } else {
         await createClientRoomCollection(categoryName);
       }
@@ -83,19 +83,28 @@ const handleDotClick = async (roomIndex, dotIndex) => {
     const updatedRooms = [...rooms];
     const room = updatedRooms[roomIndex];
   
-    if (signedUpRooms.includes(roomIndex)) {
+    if (signedUpRooms.length > 0) {
       console.log("User has already signed up for a room in this category");
       return;
     }
   
     if (role === "Patient") {
-      if (room.patients < 6) {
-        room.patients += 1;
+      if (dotIndex >= 0 && dotIndex < 6) {
+        // Only patients can click dots 0-5
+        if (room.patients < 6) {
+          room.patients += 1;
+          room.counselors = room.counselors.filter((counselorIndex) => counselorIndex < 7);
+          room.counselors.push(7, 8, 9); // Reset counselors to initial state
+          room.selectedDot = dotIndex; // Store the selected dotIndex for color change
+        }
       }
     } else if (role === "Counselor") {
-      if (dotIndex === 7 || dotIndex === 8 || dotIndex === 9) {
+      if (dotIndex >= 7 && dotIndex <= 9) {
+        // Only counselors can click dots 7-9
         if (room.counselors.length < 3) {
           room.counselors.push(dotIndex);
+          room.patients = 0; // Reset patients to initial state
+          room.selectedDot = dotIndex; // Store the selected dotIndex for color change
         }
       }
     }
@@ -110,11 +119,12 @@ const handleDotClick = async (roomIndex, dotIndex) => {
       categoryName: categoryName,
       timestamp: new Date().getTime(),
       roomIndex: roomIndex,
+      seat: dotIndex,
     };
   
     try {
-      if (!signedUpRooms.includes(roomIndex)) {
-        await joinRoom(roomIndex, role, new Date().getTime(), categoryName);
+      if (signedUpRooms.length === 0) {
+        await joinRoom(roomIndex, role, new Date().getTime(), categoryName, roomJoinData);
         console.log("Room join data saved to Firestore:", roomJoinData);
   
         // Add categoryName to groupsClientParticipates
@@ -126,7 +136,6 @@ const handleDotClick = async (roomIndex, dotIndex) => {
       console.error("Error joining room:", error);
     }
   };
-  
 
   return (
     <div>
@@ -143,7 +152,7 @@ const handleDotClick = async (roomIndex, dotIndex) => {
                 className={`dot ${
                   role === "Patient" && room.patients > patientIndex ? "blue" : ""
                 }`}
-                onClick={() => handleDotClick(roomIndex, patientIndex, categoryName)}
+                onClick={() => handleDotClick(roomIndex, patientIndex)}
               ></div>
             ))}
             {[...Array(3)].map((_, counselorIndex) => (
@@ -155,18 +164,18 @@ const handleDotClick = async (roomIndex, dotIndex) => {
                     ? "dark-red"
                     : ""
                 }`}
-                onClick={() => handleDotClick(roomIndex, counselorIndex + 7, categoryName)}
+                onClick={() => handleDotClick(roomIndex, counselorIndex + 7)}
               ></div>
             ))}
           </div>
         ))}
       </div>
-      {/* Rest of the Category Page content */}
     </div>
   );
 };
 
 export default CategoryPage;
+
 
 
 
