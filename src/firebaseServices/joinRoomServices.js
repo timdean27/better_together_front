@@ -1,8 +1,8 @@
-import { setDoc, collection, doc, query, where, getDocs } from "firebase/firestore";
+import { setDoc, collection, doc, query, where, getDocs, addDoc, getDoc } from "firebase/firestore";
 import { firebaseDB } from "../firebase";
 import { auth } from "../firebase";
 
-export const joinRoom = async (roomIndex, role, timestamp, categoryName) => {
+export const joinRoom = async (roomIndex, role, timestamp, categoryName , dotIndex) => {
   try {
     const user = auth.currentUser;
     if (!user) {
@@ -14,32 +14,29 @@ export const joinRoom = async (roomIndex, role, timestamp, categoryName) => {
     console.log("Room Index:", roomIndex);
     console.log("Role:", role);
     console.log("Category Name:", categoryName);
-
-    const signedUpRooms = await getSignedUpRooms(role, categoryName);
-    if (signedUpRooms.includes(roomIndex)) {
+    console.log("dotIndex = seat", dotIndex.seat)
+    const signedUpRooms = await getSignedUpRooms(uid, categoryName);
+    if (signedUpRooms.includes(roomIndex.toString())) {
       throw new Error("User already joined a room for this category");
-    }
-
-    const hasRoomForCategory = await checkUserHasRoomForCategory(uid, categoryName);
-    if (hasRoomForCategory) {
-      throw new Error("User already has a room for this category");
     }
 
     const joinedRoom = {
       roomIndex: roomIndex,
       userRole: role,
-      categoryName: categoryName,
       timestamp: timestamp,
-      uid: uid,
+      seat : dotIndex.seat,
     };
 
     const clientsCurrentRoomsCollection = collection(
       firebaseDB,
-      "clientsCurrentRooms"
+      "clientsCurrentRooms",
+      uid,
+      "groupsClientParticipates"
     );
-    const newDocRef = doc(clientsCurrentRoomsCollection, uid);
+    const categoryDocRef = doc(clientsCurrentRoomsCollection, categoryName);
+    const roomDocRef = doc(categoryDocRef, "rooms", roomIndex.toString());
 
-    await setDoc(newDocRef, joinedRoom);
+    await setDoc(roomDocRef, joinedRoom);
 
     console.log("Joined room stored in Firestore under user's UID");
   } catch (error) {
@@ -48,11 +45,10 @@ export const joinRoom = async (roomIndex, role, timestamp, categoryName) => {
   }
 };
 
-export const getSignedUpRooms = async (role, categoryName) => {
+export const getSignedUpRooms = async (categoryName) => {
   try {
     const q = query(
       collection(firebaseDB, "clientsCurrentRooms"),
-      where("userRole", "==", role),
       where("categoryName", "==", categoryName)
     );
     const querySnapshot = await getDocs(q);
@@ -68,29 +64,48 @@ export const getSignedUpRooms = async (role, categoryName) => {
   }
 };
 
-export const getUserSignedUpRooms = async (uid, categoryName) => {
+
+export const createClientRoomCollection = async (categoryName) => {
   try {
-    const signedUpRooms = await getSignedUpRooms(uid, categoryName);
-    // Here you can update your user interface to reflect the signed up rooms
-    // For example, set a state variable indicating the signed up rooms for the user
-    console.log("Signed up rooms for category", categoryName, ":", signedUpRooms);
+    const client = auth.currentUser;
+    if (!client) {
+      throw new Error("Client not authenticated");
+    }
+
+    const uid = client.uid;
+    const collectionRef = collection(firebaseDB, "clientsCurrentRooms", uid, "groupsClientParticipates");
+    const categoryDocRef = doc(collectionRef, categoryName);
+
+    await setDoc(categoryDocRef, {});
+
+    console.log("Client room collection created for category:", categoryName);
   } catch (error) {
-    console.error("Error fetching user's signed up rooms:", error);
+    console.error("Error creating client room collection:", error);
+    throw error;
   }
 };
 
-export const checkUserHasRoomForCategory = async (uid, categoryName) => {
+export const getClientRoomCollection = async (categoryName) => {
   try {
-    const q = query(
-      collection(firebaseDB, "clientsCurrentRooms"),
-      where("uid", "==", uid),
-      where("categoryName", "==", categoryName)
-    );
-    const querySnapshot = await getDocs(q);
-    return !querySnapshot.empty;
+    const client = auth.currentUser;
+    if (!client) {
+      throw new Error("Client not authenticated");
+    }
+
+    const uid = client.uid;
+    const collectionRef = collection(firebaseDB, "clientsCurrentRooms", uid, "groupsClientParticipates");
+    const categoryDocRef = doc(collectionRef, categoryName);
+    const docSnapshot = await getDoc(categoryDocRef);
+
+    if (docSnapshot.exists()) {
+      return docSnapshot.ref;
+    } else {
+      return null;
+    }
   } catch (error) {
-    console.error("Error checking user's room for category:", error);
-    return false;
+    console.error("Error getting client room collection:", error);
+    throw error;
   }
 };
+
 
