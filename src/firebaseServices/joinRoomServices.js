@@ -2,7 +2,7 @@ import { setDoc, collection, doc, query, where, getDocs, addDoc, getDoc } from "
 import { firebaseDB } from "../firebase";
 import { auth } from "../firebase";
 
-export const joinRoom = async (roomIndex, role, timestamp, categoryName , dotIndex) => {
+export const joinRoom = async (roomIndex, role, timestamp, categoryName, dotIndex) => {
   try {
     const user = auth.currentUser;
     if (!user) {
@@ -14,7 +14,7 @@ export const joinRoom = async (roomIndex, role, timestamp, categoryName , dotInd
     console.log("Room Index:", roomIndex);
     console.log("Role:", role);
     console.log("Category Name:", categoryName);
-    console.log("dotIndex = seat", dotIndex.seat)
+    console.log("dotIndex = seat", dotIndex.seat);
     const signedUpRooms = await getSignedUpRooms(uid, categoryName);
     if (signedUpRooms.includes(roomIndex.toString())) {
       throw new Error("User already joined a room for this category");
@@ -24,7 +24,7 @@ export const joinRoom = async (roomIndex, role, timestamp, categoryName , dotInd
       roomIndex: roomIndex,
       userRole: role,
       timestamp: timestamp,
-      seat : dotIndex.seat,
+      seat: dotIndex.seat,
     };
 
     const clientsCurrentRoomsCollection = collection(
@@ -45,11 +45,12 @@ export const joinRoom = async (roomIndex, role, timestamp, categoryName , dotInd
   }
 };
 
-export const getSignedUpRooms = async (categoryName) => {
+export const getSignedUpRooms = async (uid, categoryName) => {
   try {
     const q = query(
       collection(firebaseDB, "clientsCurrentRooms"),
-      where("categoryName", "==", categoryName)
+      where("categoryName", "==", categoryName),
+      where("uid", "==", uid)
     );
     const querySnapshot = await getDocs(q);
 
@@ -73,7 +74,12 @@ export const createClientRoomCollection = async (categoryName) => {
     }
 
     const uid = client.uid;
-    const collectionRef = collection(firebaseDB, "clientsCurrentRooms", uid, "groupsClientParticipates");
+    const collectionRef = collection(
+      firebaseDB,
+      "clientsCurrentRooms",
+      uid,
+      "groupsClientParticipates"
+    );
     const categoryDocRef = doc(collectionRef, categoryName);
 
     await setDoc(categoryDocRef, {});
@@ -93,7 +99,12 @@ export const getClientRoomCollection = async (categoryName) => {
     }
 
     const uid = client.uid;
-    const collectionRef = collection(firebaseDB, "clientsCurrentRooms", uid, "groupsClientParticipates");
+    const collectionRef = collection(
+      firebaseDB,
+      "clientsCurrentRooms",
+      uid,
+      "groupsClientParticipates"
+    );
     const categoryDocRef = doc(collectionRef, categoryName);
     const docSnapshot = await getDoc(categoryDocRef);
 
@@ -107,5 +118,26 @@ export const getClientRoomCollection = async (categoryName) => {
     throw error;
   }
 };
+
+export const getGroupClientsParticipates = async (categoryName) => {
+  try {
+    const q = query(
+      collection(firebaseDB, "clientsCurrentRooms"),
+      where("categoryName", "==", categoryName)
+    );
+    const querySnapshot = await getDocs(q);
+
+    const groupClientsParticipates = [];
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      groupClientsParticipates.push({ uid: data.uid, roomIndex: data.roomIndex });
+    });
+
+    return groupClientsParticipates;
+  } catch (error) {
+    throw new Error("Error fetching group clients participates: " + error.message);
+  }
+};
+
 
 
