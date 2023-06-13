@@ -6,6 +6,7 @@ import {
   getSignedUpRooms,
   createClientRoomCollection,
   getClientRoomCollection,
+  getGroupClientsParticipates,
 } from "../firebaseServices/joinRoomServices";
 
 const CategoryPage = ({ selectedRole }) => {
@@ -14,6 +15,7 @@ const CategoryPage = ({ selectedRole }) => {
   const [rooms, setRooms] = useState([]);
   const [signedUpRooms, setSignedUpRooms] = useState([]);
   const [clientRoomCollection, setClientRoomCollection] = useState(null);
+  const [groupClientsParticipates, setGroupClientsParticipates] = useState([]);
 
   useEffect(() => {
     const storedRole = localStorage.getItem("selectedRole");
@@ -23,6 +25,7 @@ const CategoryPage = ({ selectedRole }) => {
     initializeRooms();
     fetchSignedUpRooms();
     initializeClientRoomCollection();
+    fetchGroupClientsParticipates();
   }, []);
 
   // Initialize the rooms state with default values
@@ -78,16 +81,27 @@ const CategoryPage = ({ selectedRole }) => {
     }
   };
 
-// Handle the click event of a dot
-const handleDotClick = async (roomIndex, dotIndex) => {
+  // Fetch the group's clients participates for the current category
+  const fetchGroupClientsParticipates = async () => {
+    try {
+      const groupClientsParticipatesData = await getGroupClientsParticipates(categoryName);
+      setGroupClientsParticipates(groupClientsParticipatesData);
+      console.log("Group Clients Participates:", groupClientsParticipatesData);
+    } catch (error) {
+      console.error("Error fetching group clients participates:", error);
+    }
+  };
+
+  // Handle the click event of a dot
+  const handleDotClick = async (roomIndex, dotIndex) => {
     const updatedRooms = [...rooms];
     const room = updatedRooms[roomIndex];
-  
+
     if (signedUpRooms.length > 0) {
       console.log("User has already signed up for a room in this category");
       return;
     }
-  
+
     if (role === "Patient") {
       if (dotIndex >= 0 && dotIndex < 6) {
         // Only patients can click dots 0-5
@@ -108,12 +122,12 @@ const handleDotClick = async (roomIndex, dotIndex) => {
         }
       }
     }
-  
-    setRooms(updatedRooms);
+
+    setRooms([...rooms]);
     console.log("Current Rooms:", updatedRooms);
     console.log("Current Patients:", updatedRooms[roomIndex].patients);
     console.log("Current Counselors:", updatedRooms[roomIndex].counselors);
-  
+
     const roomJoinData = {
       userRole: role,
       categoryName: categoryName,
@@ -121,12 +135,12 @@ const handleDotClick = async (roomIndex, dotIndex) => {
       roomIndex: roomIndex,
       seat: dotIndex,
     };
-  
+
     try {
       if (signedUpRooms.length === 0) {
         await joinRoom(roomIndex, role, new Date().getTime(), categoryName, roomJoinData);
         console.log("Room join data saved to Firestore:", roomJoinData);
-  
+
         // Add categoryName to groupsClientParticipates
         const updatedSignedUpRooms = [...signedUpRooms, roomIndex];
         setSignedUpRooms(updatedSignedUpRooms);
@@ -135,6 +149,14 @@ const handleDotClick = async (roomIndex, dotIndex) => {
     } catch (error) {
       console.error("Error joining room:", error);
     }
+  };
+
+  // Check if a dot should be filled based on groupClientsParticipates
+  const isDotFilled = (roomIndex, dotIndex) => {
+    const groupClientParticipates = groupClientsParticipates.find(
+      (participate) => participate.roomIndex === roomIndex && participate.seat === dotIndex
+    );
+    return groupClientParticipates ? true : false;
   };
 
   return (
@@ -151,7 +173,7 @@ const handleDotClick = async (roomIndex, dotIndex) => {
                 id={`dot-${roomIndex}-${patientIndex}`}
                 className={`dot ${
                   role === "Patient" && room.patients > patientIndex ? "blue" : ""
-                }`}
+                } ${isDotFilled(roomIndex, patientIndex) ? "filled" : ""}`}
                 onClick={() => handleDotClick(roomIndex, patientIndex)}
               ></div>
             ))}
@@ -163,7 +185,7 @@ const handleDotClick = async (roomIndex, dotIndex) => {
                   role === "Counselor" && room.counselors.includes(counselorIndex + 7)
                     ? "dark-red"
                     : ""
-                }`}
+                } ${isDotFilled(roomIndex, counselorIndex + 7) ? "filled" : ""}`}
                 onClick={() => handleDotClick(roomIndex, counselorIndex + 7)}
               ></div>
             ))}
@@ -175,6 +197,7 @@ const handleDotClick = async (roomIndex, dotIndex) => {
 };
 
 export default CategoryPage;
+
 
 
 
