@@ -155,7 +155,9 @@ const CategoryPage = ({ selectedRole }) => {
   const isDotFilled = (roomIndex, dotIndex) => {
     const groupClientParticipates = groupClientsParticipates.find(
       (participate) => participate.roomIndex === roomIndex && participate.seat === dotIndex
+      
     );
+    console.log("Check Room index that is filled", roomIndex);
     return groupClientParticipates ? true : false;
   };
 
